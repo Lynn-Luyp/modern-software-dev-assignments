@@ -7,7 +7,36 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a Character-Level Processing Unit.
+
+CRITICAL RULE:
+To reverse a word, you must reverse single character in this word character-by-character.
+
+<Example1>
+Input: apple
+Output: elppa
+</Example1>
+<Example2>
+Input: banana
+Output: ananab
+</Example2>
+<Example3>
+Input: applebanana
+Output: ananabelppa
+</Example3>
+<Example4>
+Input: http
+Output: ptth
+</Example4>
+<Example5>
+Input: status
+Output: sutats
+</Example5>
+
+Task: Reverse the word provided by the user.
+Output ONLY the final word.
+"""
 
 USER_PROMPT = """
 Reverse the order of letters in the following word. Only output the reversed word, no other text:

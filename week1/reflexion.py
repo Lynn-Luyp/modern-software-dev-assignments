@@ -15,7 +15,10 @@ Keep the implementation minimal.
 """
 
 # TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = """
+You need to guess the function is_valid_password(password: str) -> bool codes.
+After failure, you need to reflex it, guess the password rules, and improve your codes, to pass 100% testcases finally.
+"""
 
 
 # Ground-truth test suite used to evaluate generated code
@@ -96,6 +99,13 @@ def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
+    if prev_code and failures:
+        failure_msg = "\n".join(failures)
+        return (
+            f"Previous code attempt:\n```python\n{prev_code}\n```\n\n"
+            f"The following requirements were MISSING or INCORRECT:\n{failure_msg}\n\n"
+            f"Please fix the code based on these failures."
+        )
     return ""
 
 
