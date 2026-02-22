@@ -22,23 +22,37 @@ For each exercise, please include what prompts you used to generate the answer, 
 ### Exercise 1: Scaffold a New Feature
 Prompt: 
 ```
-TODO
+You are an excellent engineering developer. In extract_action_items function in the extract.py file, you need to implement an LLM-powered alternative, extract_action_items_llm(), that utilizes Ollama to perform action item extraction via a large language model.
+
+Tips:
+1. To produce structured outputs (i.e. JSON array of strings), use the "format" parameter.
+2. Use ollama small model first, such as llama3.2-vision.
 ``` 
 
 Generated Code Snippets:
 ```
-TODO: List all modified code files with the relevant line numbers.
+week2/app/services/extract.py (lines 69-103):
+1. Added extract_action_items_llm() that calls ollama.chat with llama3.2-vision model.
+2. Uses a system prompt instructing the LLM to return only concise, imperative action items.
+3. Employs structured output via the "format" parameter to constrain the response to a JSON object with an "action_items" array of strings.
+4. Parses the response with json.loads and returns the action_items list.
+5. Gracefully handles missing keys by defaulting to an empty list via dict.get().
 ```
 
 ### Exercise 2: Add Unit Tests
 Prompt: 
 ```
-TODO
+Write unit tests for extract_action_items_llm() covering multiple inputs (e.g., bullet lists, keyword-prefixed lines, empty input) in week2/tests/test_extract.py. Don't use mock functions — call the real Ollama extract_action_items_llm. Please cover more edge cases.
 ``` 
 
 Generated Code Snippets:
 ```
-TODO: List all modified code files with the relevant line numbers.
+week2/tests/test_extract.py (lines 1-178):
+1. Removed all mocking (no _mock_ollama_response, no @patch); every LLM test calls the real Ollama endpoint.
+2. Added a _any_item_contains() helper for flexible case-insensitive keyword assertions, since LLM output is non-deterministic.
+3. Covers 14 edge cases: bullet lists, keyword-prefixed lines (todo:/action:/next:), checkboxes, empty input, whitespace-only, pure narrative, mixed content, single item, numbered lists, special characters, many items, return-type validation, and imperative sentences without bullets.
+4. Assertions check structural properties (isinstance list, items are str, reasonable count) plus fuzzy keyword matching rather than exact string equality.
+5. Kept the original test_extract_bullets_and_checkboxes() for the regex-based extract_action_items().
 ```
 
 ### Exercise 3: Refactor Existing Code for Clarity
