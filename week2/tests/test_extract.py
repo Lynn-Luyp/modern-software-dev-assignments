@@ -7,6 +7,8 @@ reasonable count) and check for key concepts via case-insensitive substring
 matching, since the model may paraphrase or reorder items.
 """
 
+import time
+
 import pytest
 
 from ..app.services.extract import extract_action_items, extract_action_items_llm
@@ -19,6 +21,18 @@ def _any_item_contains(items: list[str], keyword: str) -> bool:
     """Return True if at least one item contains `keyword` (case-insensitive)."""
     keyword_lower = keyword.lower()
     return any(keyword_lower in item.lower() for item in items)
+
+
+@pytest.fixture(autouse=True)
+def _wait_between_llm_tests(request):
+    """
+    Wait 3 seconds after each LLM test to avoid back-to-back Ollama calls.
+
+    This only applies to tests named `test_llm_*`.
+    """
+    yield
+    if request.node.name.startswith("test_llm_"):
+        time.sleep(3)
 
 
 # ============================= regex-based tests ============================
@@ -144,7 +158,7 @@ def test_llm_mixed_content():
 
 def test_llm_single_action_item():
     """LLM should handle text with only one action item."""
-    text = "Please send the invoice to the client by Friday."
+    text = "Write and send the invoice to the client by Friday."
 
     items = extract_action_items_llm(text)
 

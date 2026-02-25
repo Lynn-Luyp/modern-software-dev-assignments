@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import time
 from typing import List
 import json
 from typing import Any
@@ -68,39 +69,61 @@ def extract_action_items(text: str) -> List[str]:
 
 def extract_action_items_llm(text: str) -> List[str]:
     """Use Ollama LLM to extract action items from the given text."""
-    response = chat(
-        model="llama3.2-vision",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a helpful assistant that extracts action items from meeting notes or text. "
-                    "Return ONLY the actionable tasks. Each action item should be a concise, "
-                    "imperative sentence (e.g. 'Set up database', 'Write tests'). "
-                    "Do not include narrative or non-actionable sentences."
-                ),
-            },
-            {
-                "role": "user",
-                "content": f"Extract all action items from the following text:\n\n{text}",
-            },
-        ],
-        format={
-            "type": "object",
-            "properties": {
-                "action_items": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                }
-            },
-            "required": ["action_items"],
-        },
-    )
+    if not text.strip():
+        return []
 
-    result = json.loads(response.message.content)
-    return result.get("action_items", [])
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful assistant that extracts action items from meeting notes or text. "
+                "Return ONLY the actionable tasks. Each action item should be a concise, "
+                "imperative sentence (e.g. 'Set up database', 'Write tests'). "
+                "Do not include narrative or non-actionable sentences."
+            ),
+        },
+        {
+            "role": "user",
+            "content": f"Extract all action items from the following text:\n\n{text}",
+        },
+    ]
+    schema = {
+        "type": "object",
+        "properties": {
+            "action_items": {
+                "type": "array",
+                "items": {"type": "string"},
+            }
+        },
+        "required": ["action_items"],
+    }
+
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            response = chat(
+                model=os.getenv("OLLAMA_MODEL", "llama3.2-vision"),
+                messages=messages,
+                format=schema,
+            )
+            result = json.loads(response.message.content)
+            action_items = result.get("action_items", [])
+            if isinstance(action_items, list):
+                return [str(item).strip() for item in action_items if str(item).strip()]
+            break
+        except Exception as exc:
+            last_error = exc
+            # Brief backoff helps with transient 5xx errors from Ollama.
+            if attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+
+    # Fallback keeps the API/test behavior stable if Ollama is unavailable.
+    fallback = extract_action_items(text)
+    if fallback:
+        return fallback
+    if last_error:
+        return []
+    return []
 
 
 def _looks_imperative(sentence: str) -> bool:

@@ -74,7 +74,7 @@
     	….
     </code_snippet>
     
-    Here is the path to the requests-oauthlib documentation:<url>
+    Here is the path to the requests-oauthlib documentation:<url>
     https://requests-oauthlib.readthedocs.io/en/latest/
     </url>
     ```
@@ -181,3 +181,9 @@
 1. **目前的智能体在处理大量工具时表现不佳**，工具越多，模型越不知道该挑选哪个
 2. **API描述会快速占满你的上下文窗口**，导致原本的上下文空间被工具占用，影响模型表现
 3. **设计API时要以AI为本，而非僵化的格式**，原先的API是为人类设计的，这种接口格式对AI不友好
+
+
+
+软件路径：
+
+(cs146s) D:\Github\cs146S\modern-software-dev-assignments>C:\Users\Perry_Lu\AppData\Roaming\Python\Scripts\poetry run uvicorn week2.app.main:app --reload

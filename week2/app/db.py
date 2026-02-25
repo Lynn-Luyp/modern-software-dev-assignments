@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 from typing import Optional
@@ -8,6 +9,12 @@ from typing import Optional
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "app.db"
+APP_TZ_OFFSET_HOURS = int(os.getenv("APP_TZ_OFFSET_HOURS", "8"))
+
+
+def _sqlite_tz_modifier() -> str:
+    sign = "+" if APP_TZ_OFFSET_HOURS >= 0 else "-"
+    return f"{sign}{abs(APP_TZ_OFFSET_HOURS)} hours"
 
 
 def ensure_data_directory_exists() -> None:
@@ -52,7 +59,10 @@ def init_db() -> None:
 def insert_note(content: str) -> int:
     with get_connection() as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO notes (content) VALUES (?)", (content,))
+        cursor.execute(
+            "INSERT INTO notes (content, created_at) VALUES (?, datetime('now', ?))",
+            (content, _sqlite_tz_modifier()),
+        )
         connection.commit()
         return int(cursor.lastrowid)
 
@@ -81,8 +91,8 @@ def insert_action_items(items: list[str], note_id: Optional[int] = None) -> list
         ids: list[int] = []
         for item in items:
             cursor.execute(
-                "INSERT INTO action_items (note_id, text) VALUES (?, ?)",
-                (note_id, item),
+                "INSERT INTO action_items (note_id, text, created_at) VALUES (?, ?, datetime('now', ?))",
+                (note_id, item, _sqlite_tz_modifier()),
             )
             ids.append(int(cursor.lastrowid))
         connection.commit()

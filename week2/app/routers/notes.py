@@ -24,6 +24,19 @@ def create_note(payload: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+@router.get("")
+def list_all_notes() -> List[Dict[str, Any]]:
+    rows = db.list_notes()
+    return [
+        {
+            "id": r["id"],
+            "content": r["content"],
+            "created_at": r["created_at"],
+        }
+        for r in rows
+    ]
+
+
 @router.get("/{note_id}")
 def get_single_note(note_id: int) -> Dict[str, Any]:
     row = db.get_note(note_id)
