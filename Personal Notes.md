@@ -187,3 +187,25 @@
 软件路径：
 
 (cs146s) D:\Github\cs146S\modern-software-dev-assignments>C:\Users\Perry_Lu\AppData\Roaming\Python\Scripts\poetry run uvicorn week2.app.main:app --reload
+
+
+
+## Week3 The AI IDE
+
+**MCP (Model Context Protocol)** 的核心价值是为 AI 建立了一套**“即插即用”的标准接口**
+
+做了什么：
+
+MCP 充当了 **AI 模型**与**外部数据/工具**之间的“中间人”，主要实现了三件事：
+
+- **暴露工具 (Tools)**：允许 AI 执行具体动作，如“查询余额”、“抓取币价”或“提交 GitHub 代码”。
+- **提供资源 (Resources)**：让 AI 能直接读取外部数据源，比如你的理财笔记文件、数据库内容或本地代码库。
+- **预设模板 (Prompts)**：提供预先定义好的对话模板，让 AI 按照特定逻辑（如财务审计逻辑）进行交互。
+
+
+
+
+
+![image-20260225211347954](C:\Users\Perry_Lu\AppData\Roaming\Typora\typora-user-images\image-20260225211347954.png)
+
+MCP分为三步：read_file_tool, list_files_tool, edit_file_tool
