@@ -1,4 +1,4 @@
-from backend.app.services.extract import extract_action_items
+from backend.app.services.parser import extract_action_items
 
 
 def test_extract_action_items():

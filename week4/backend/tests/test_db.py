@@ -1,13 +1,10 @@
-import tempfile
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-
 from backend.app.db import get_session
 from backend.app.models import Base
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 
 
 def test_get_session_context_manager():
