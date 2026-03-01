@@ -14,3 +14,10 @@ def test_create_and_complete_action_item(client):
     assert r.status_code == 200
     items = r.json()
     assert len(items) == 1
+
+
+def test_complete_nonexistent_action_item(client):
+    # Try to complete a non-existent action item
+    r = client.put("/action-items/99999/complete")
+    assert r.status_code == 404
+    assert "not found" in r.json()["detail"].lower()
